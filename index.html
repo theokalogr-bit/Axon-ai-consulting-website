@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXON — AI Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0c0b09;
+    --bg2: #121009;
+    --surface: #181510;
+    --surface2: #201d16;
+    --border: rgba(212, 170, 80, 0.12);
+    --border-bright: rgba(212, 170, 80, 0.35);
+    --gold: #d4aa50;
+    --gold-light: #e8c97a;
+    --gold-dim: rgba(212, 170, 80, 0.6);
+    --amber: #c8922a;
+    --text: #f0ead8;
+    --text-muted: #8a8070;
+    --text-dim: #4a4438;
+    --white: #faf8f2;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Cormorant Garamond', serif;
+    --sans: 'Outfit', sans-serif;
+    --gutter: clamp(1.5rem, 5vw, 5rem);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease, border-color 0.3s ease;
+  }
+  body:hover .cursor { opacity: 1; }
+  a:hover ~ .cursor, button:hover ~ .cursor { width: 14px; height: 14px; }
+
+  /* GRAIN TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem var(--gutter);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.4s, background 0.4s, backdrop-filter 0.4s;
+  }
+  nav.scrolled {
+    border-color: var(--border);
+    background: rgba(12, 11, 9, 0.82);
+    backdrop-filter: blur(18px);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    cursor: none;
+  }
+  .logo-mark {
+    width: 36px; height: 36px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width: 100%; height: 100%; }
+  .logo-text {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--white);
+    line-height: 1;
+  }
+  .logo-sub {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-top: 3px;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: none;
+    position: relative;
+    transition: color 0.25s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0;
+    width: 0; height: 1px;
+    background: var(--gold);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--gold);
+    border: none;
+    padding: 0.6rem 1.4rem;
+    cursor: none;
+    transition: background 0.25s, transform 0.2s;
+  }
+  .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .nav-cta:active { transform: translateY(0); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 8rem var(--gutter) 6rem;
+    position: relative;
+    overflow: hidden;
+    gap: 4rem;
+  }
+
+  /* Neural grid background */
+  .hero-canvas {
+    position: absolute;
+    inset: 0;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  /* Radial glow */
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 10%; right: -10%;
+    width: 60vw; height: 60vw;
+    background: radial-gradient(ellipse, rgba(212, 170, 80, 0.07) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-left { position: relative; z-index: 2; }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 2rem; height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(3.2rem, 6vw, 6.5rem);
+    font-weight: 300;
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .hero-title .line-2 {
+    display: block;
+    padding-left: 3rem;
+  }
+
+  .hero-body {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+    max-width: 44ch;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .btn-primary {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--gold);
+    border: none;
+    padding: 0.9rem 2.2rem;
+    cursor: none;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold-light);
+    transform: translateX(-101%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-primary span { position: relative; z-index: 1; }
+
+  .btn-ghost {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 0.9rem 2.2rem;
+    cursor: none;
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.25s, border-color 0.25s, transform 0.2s;
+  }
+  .btn-ghost:hover {
+    color: var(--text);
+    border-color: var(--border-bright);
+    transform: translateY(-2px);
+  }
+
+  .hero-right {
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeIn 1.2s 0.7s ease forwards;
+  }
+
+  .hero-visual {
+    position: relative;
+    aspect-ratio: 1;
+    max-width: 520px;
+    margin-left: auto;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+  }
+  .orb-1 {
+    width: 60%; height: 60%;
+    top: 10%; left: 20%;
+    background: radial-gradient(circle, rgba(212, 170, 80, 0.25) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  .orb-2 {
+    width: 40%; height: 40%;
+    bottom: 15%; right: 10%;
+    background: radial-gradient(circle, rgba(200, 146, 42, 0.2) 0%, transparent 70%);
+    animation: pulse 5.5s 1s ease-in-out infinite;
+  }
+
+  .circuit-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    z-index: 2;
+    box-shadow:
+      0 0 0 1px rgba(212, 170, 80, 0.04),
+      0 20px 60px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(212, 170, 80, 0.08);
+  }
+  .circuit-card::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 2rem; right: 2rem; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .metric {
+    padding: 1.2rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .metric-val {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: var(--gold-light);
+    line-height: 1;
+    display: block;
+  }
+  .metric-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 0.4rem;
+    display: block;
+  }
+
+  .card-divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 1.5rem;
+  }
+
+  .card-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--gutter);
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+  .section-divider::before, .section-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .section-divider span {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* CLIENTS / LOGOS */
+  .clients {
+    padding: 4rem var(--gutter);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .clients-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .clients-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(2rem, 5vw, 5rem);
+    flex-wrap: wrap;
+  }
+  .client-name {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    transition: color 0.3s;
+    cursor: none;
+    user-select: none;
+  }
+  .client-name:hover { color: var(--text-muted); }
+
+  /* SERVICES */
+  .services {
+    padding: 8rem var(--gutter);
+    position: relative;
+  }
+  .services::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: var(--border);
+  }
+
+  .section-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 5rem;
+    align-items: end;
+  }
+  .section-kicker {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-kicker::before {
+    content: '';
+    display: block;
+    width: 1.5rem; height: 1px;
+    background: var(--gold);
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 4vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--white);
+  }
+  .section-title em { font-style: italic; color: var(--gold-light); }
+  .section-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    max-width: 48ch;
+    align-self: end;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .service-card {
+    background: var(--bg);
+    padding: 2.5rem;
+    position: relative;
+    transition: background 0.3s;
+    cursor: none;
+    overflow: hidden;
+  }
+  .service-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .service-card:hover { background: var(--surface); }
+  .service-card:hover::after { transform: scaleX(1); }
+
+  .service-num {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    margin-bottom: 1.8rem;
+  }
+  .service-icon {
+    width: 40px; height: 40px;
+    margin-bottom: 1.5rem;
+    color: var(--gold);
+  }
+  .service-icon svg { width: 100%; height: 100%; }
+  .service-name {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
+  }
+  .service-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* PROCESS */
+  .process {
+    padding: 8rem var(--gutter);
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-top: 5rem;
+    position: relative;
+  }
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    left: calc(12.5% + 1rem);
+    right: calc(12.5% + 1rem);
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold-dim), var(--border), var(--gold-dim));
+  }
+
+  .step {
+    position: relative;
+  }
+  .step-num-wrap {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  .step-num {
+    width: 3rem; height: 3rem;
+    border: 1px solid var(--border-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--gold);
+    background: var(--surface);
+    position: relative;
+    z-index: 1;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .step:hover .step-num {
+    background: var(--gold);
+    color: var(--bg);
+    border-color: var(--gold);
+  }
+  .step-title {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 0.6rem;
+  }
+  .step-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* CASE STUDIES */
+  .cases {
+    padding: 8rem var(--gutter);
+  }
+  .cases-grid {
+    display: grid;
+    grid-template-columns: 5fr 4fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 4rem;
+  }
+  .case-card {
+    background: var(--bg);
+    padding: 3rem;
+    position: relative;
+    cursor: none;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .case-card:hover { background: var(--surface); }
+
+  .case-tag {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--border-bright);
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    margin-bottom: 1.5rem;
+  }
+  .case-title {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+  .case-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+  .case-result {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--gold-dim);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .case-result::before { content: '→'; color: var(--gold); }
+
+  .case-image {
+    width: 100%; aspect-ratio: 16/9;
+    background: var(--surface2);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    position: relative;
+  }
+  .case-image svg {
+    display: block;
+    width: 100%; height: 100%;
+    transition: opacity 0.4s;
+  }
+  .case-card:hover .case-image svg { opacity: 0.85; }
+
+  /* TESTIMONIAL */
+  .testimonial-section {
+    padding: 8rem var(--gutter);
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .testimonial-section::before {
+    content: '"';
+    position: absolute;
+    top: -2rem; right: 5%;
+    font-family: var(--serif);
+    font-size: 30vw;
+    color: rgba(212, 170, 80, 0.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .testimonial {
+    max-width: 56ch;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .testimonial-quote {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--white);
+    line-height: 1.5;
+    margin-bottom: 2.5rem;
+  }
+  .testimonial-author {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .testimonial-author strong {
+    display: block;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+    font-weight: 400;
+  }
+
+  /* TEAM */
+  .team {
+    padding: 8rem var(--gutter);
+  }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 4rem;
+  }
+  .team-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: none;
+    transition: border-color 0.3s;
+  }
+  .team-card:hover { border-color: var(--border-bright); }
+  .team-photo {
+    width: 100%; aspect-ratio: 3/4;
+    display: block;
+    opacity: 0.85;
+    transition: opacity 0.4s;
+  }
+  .team-card:hover .team-photo { opacity: 1; }
+  .team-info {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .team-name {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--white);
+  }
+  .team-role {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 0.3rem;
+  }
+
+  /* CTA */
+  .cta-section {
+    padding: 10rem var(--gutter);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80vw; height: 60vh;
+    background: radial-gradient(ellipse, rgba(212, 170, 80, 0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .cta-kicker {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .cta-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 5vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 2rem;
+  }
+  .cta-title em { font-style: italic; color: var(--gold-light); }
+  .cta-sub {
+    font-size: 1rem;
+    color: var(--text-muted);
+    max-width: 44ch;
+    margin: 0 auto 3rem;
+    line-height: 1.75;
+  }
+  .cta-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 4rem var(--gutter);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+  }
+  .footer-brand .logo { margin-bottom: 1.2rem; }
+  .footer-tagline {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 28ch;
+    margin-bottom: 1.5rem;
+  }
+  .footer-social {
+    display: flex;
+    gap: 1rem;
+  }
+  .social-link {
+    width: 34px; height: 34px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: none;
+    transition: border-color 0.25s, color 0.25s;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+  }
+  .social-link:hover { border-color: var(--border-bright); color: var(--gold); }
+  .footer-col h4 {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1.2rem;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 0.6rem; }
+  .footer-col ul a {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: none;
+    transition: color 0.25s;
+  }
+  .footer-col ul a:hover { color: var(--text); }
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem var(--gutter);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-bottom-text {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.08); opacity: 0.75; }
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+  @keyframes drift {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-12px); }
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .hero { grid-template-columns: 1fr; padding-top: 10rem; }
+    .hero-right { display: none; }
+    .services-grid { grid-template-columns: 1fr 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    .process-steps::before { display: none; }
+    .section-header { grid-template-columns: 1fr; gap: 1.5rem; }
+    .cases-grid { grid-template-columns: 1fr; }
+    footer { grid-template-columns: 1fr 1fr; }
+    .team-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .services-grid { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr; }
+    footer { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="logo">
+    <div class="logo-mark">
+      <!-- AXON logo mark: stylized neural node -->
+      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="4" fill="#d4aa50"/>
+        <circle cx="18" cy="18" r="7" stroke="#d4aa50" stroke-width="0.8" opacity="0.4"/>
+        <!-- Axon spikes -->
+        <line x1="18" y1="11" x2="18" y2="4" stroke="#d4aa50" stroke-width="0.8"/>
+        <line x1="18" y1="25" x2="18" y2="32" stroke="#d4aa50" stroke-width="0.8"/>
+        <line x1="11" y1="18" x2="4" y2="18" stroke="#d4aa50" stroke-width="0.8"/>
+        <line x1="25" y1="18" x2="32" y2="18" stroke="#d4aa50" stroke-width="0.8"/>
+        <!-- Diagonal spikes -->
+        <line x1="13" y1="13" x2="7" y2="7" stroke="#d4aa50" stroke-width="0.8" opacity="0.6"/>
+        <line x1="23" y1="13" x2="29" y2="7" stroke="#d4aa50" stroke-width="0.8" opacity="0.6"/>
+        <line x1="13" y1="23" x2="7" y2="29" stroke="#d4aa50" stroke-width="0.8" opacity="0.6"/>
+        <line x1="23" y1="23" x2="29" y2="29" stroke="#d4aa50" stroke-width="0.8" opacity="0.6"/>
+        <!-- Node dots at ends -->
+        <circle cx="18" cy="4" r="1.5" fill="#d4aa50" opacity="0.7"/>
+        <circle cx="18" cy="32" r="1.5" fill="#d4aa50" opacity="0.7"/>
+        <circle cx="4" cy="18" r="1.5" fill="#d4aa50" opacity="0.7"/>
+        <circle cx="32" cy="18" r="1.5" fill="#d4aa50" opacity="0.7"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">AXON</div>
+      <div class="logo-sub">AI Consulting</div>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#team">Team</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Start a project</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas class="hero-canvas" id="neuralCanvas"></canvas>
+
+  <div class="hero-left">
+    <div class="hero-eyebrow">Frontier AI Consulting</div>
+    <h1 class="hero-title">
+      Intelligence<br>
+      <em>engineered</em>
+      <span class="line-2">to scale.</span>
+    </h1>
+    <p class="hero-body">
+      We help forward-thinking enterprises design, build, and deploy AI systems that create durable competitive advantages — from strategy to production.
+    </p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary"><span>Book a discovery call</span></a>
+      <a href="#work" class="btn-ghost">View our work</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-visual" style="animation: drift 6s ease-in-out infinite;">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="circuit-card">
+        <div class="metric-grid">
+          <div class="metric">
+            <span class="metric-val">94×</span>
+            <span class="metric-label">Avg. ROI</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">48h</span>
+            <span class="metric-label">Prototype</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">$2.4B</span>
+            <span class="metric-label">Value unlocked</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">120+</span>
+            <span class="metric-label">Deployments</span>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-status">
+          <div class="status-dot"></div>
+          Deployment pipeline — Active
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<div class="clients">
+  <p class="clients-label">Trusted by industry leaders</p>
+  <div class="clients-row">
+    <span class="client-name">Meridian Corp</span>
+    <span class="client-name">Vantage Capital</span>
+    <span class="client-name">Helix Bio</span>
+    <span class="client-name">Stratos Labs</span>
+    <span class="client-name">Onyx Financial</span>
+    <span class="client-name">Cascade Energy</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-header">
+    <div>
+      <div class="section-kicker">What we do</div>
+      <h2 class="section-title">
+        End-to-end AI<br>
+        <em>capability building</em>
+      </h2>
+    </div>
+    <p class="section-desc reveal">
+      From ambitious vision to working infrastructure — we cover the full spectrum of enterprise AI transformation, embedding alongside your teams every step of the way.
+    </p>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-num">01</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M20 4 L36 12 L36 28 L20 36 L4 28 L4 12 Z"/>
+          <circle cx="20" cy="20" r="5"/>
+          <line x1="20" y1="4" x2="20" y2="15"/>
+          <line x1="20" y1="25" x2="20" y2="36"/>
+          <line x1="4" y1="12" x2="15" y2="17"/>
+          <line x1="25" y1="23" x2="36" y2="28"/>
+          <line x1="36" y1="12" x2="25" y2="17"/>
+          <line x1="15" y1="23" x2="4" y2="28"/>
+        </svg>
+      </div>
+      <div class="service-name">AI Strategy & Roadmapping</div>
+      <p class="service-desc">Define your AI vision with clarity. We audit your operations, identify high-leverage opportunities, and produce a phased roadmap calibrated to your market position.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-num">02</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="4" y="10" width="32" height="20" rx="2"/>
+          <path d="M12 20 h4 l3 -6 l4 12 l3 -6 h4"/>
+        </svg>
+      </div>
+      <div class="service-name">LLM & Foundation Model Engineering</div>
+      <p class="service-desc">Fine-tuning, RAG architectures, and agent systems built for production. We specialize in making frontier models reliable, efficient, and cost-effective at scale.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-num">03</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <circle cx="20" cy="10" r="4"/>
+          <circle cx="8" cy="28" r="4"/>
+          <circle cx="32" cy="28" r="4"/>
+          <line x1="20" y1="14" x2="8" y2="24"/>
+          <line x1="20" y1="14" x2="32" y2="24"/>
+          <line x1="8" y1="28" x2="32" y2="28"/>
+        </svg>
+      </div>
+      <div class="service-name">Agentic Systems Design</div>
+      <p class="service-desc">Multi-agent pipelines that automate complex workflows. We architect systems that reason, plan, and act — replacing repetitive knowledge work with autonomous intelligence.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">04</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M6 34 L6 20 L14 14 L22 20 L22 34"/>
+          <path d="M22 34 L22 24 L34 16 L34 34"/>
+          <line x1="6" y1="34" x2="34" y2="34"/>
+        </svg>
+      </div>
+      <div class="service-name">Predictive Analytics & ML</div>
+      <p class="service-desc">Custom machine learning models that turn your data into foresight. Demand forecasting, churn prediction, anomaly detection — built and maintained by our ML engineers.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-num">05</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="6" y="6" width="12" height="12" rx="1"/>
+          <rect x="22" y="6" width="12" height="12" rx="1"/>
+          <rect x="6" y="22" width="12" height="12" rx="1"/>
+          <rect x="22" y="22" width="12" height="12" rx="1"/>
+        </svg>
+      </div>
+      <div class="service-name">Data Infrastructure & MLOps</div>
+      <p class="service-desc">Build the plumbing that powers AI at scale. Data pipelines, feature stores, model registries, and CI/CD for ML — so your models ship faster and run reliably.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-num">06</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M20 6 C10 6 6 14 6 20 C6 28 12 34 20 34 C28 34 34 28 34 20 C34 14 30 6 20 6"/>
+          <path d="M14 20 C14 16 16.5 12 20 12 C23.5 12 26 16 26 20"/>
+          <line x1="20" y1="26" x2="20" y2="34"/>
+          <circle cx="20" cy="20" r="2.5"/>
+        </svg>
+      </div>
+      <div class="service-name">AI Governance & Ethics</div>
+      <p class="service-desc">Responsible deployment frameworks, bias audits, explainability tooling, and compliance guidance — ensuring your AI systems earn and maintain stakeholder trust.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process">
+  <div class="section-header">
+    <div class="reveal">
+      <div class="section-kicker">How we work</div>
+      <h2 class="section-title">
+        A rigorous,<br>
+        <em>proven process</em>
+      </h2>
+    </div>
+    <p class="section-desc reveal reveal-delay-1">
+      Every engagement follows a disciplined four-phase methodology — balancing speed with thoroughness to deliver AI systems that actually work in the wild.
+    </p>
+  </div>
+
+  <div class="process-steps">
+    <div class="step reveal">
+      <div class="step-num-wrap">
+        <div class="step-num">01</div>
+      </div>
+      <div class="step-title">Discover</div>
+      <p class="step-desc">Deep-dive into your operations, data landscape, and strategic objectives. We identify where AI creates real leverage — not just where it's fashionable.</p>
+    </div>
+    <div class="step reveal reveal-delay-1">
+      <div class="step-num-wrap">
+        <div class="step-num">02</div>
+      </div>
+      <div class="step-title">Architect</div>
+      <p class="step-desc">Design the technical blueprint: model selection, data pipelines, integration patterns, and success metrics. You see and approve the plan before we write a line of code.</p>
+    </div>
+    <div class="step reveal reveal-delay-2">
+      <div class="step-num-wrap">
+        <div class="step-num">03</div>
+      </div>
+      <div class="step-title">Build & Iterate</div>
+      <p class="step-desc">Rapid prototypes in 48 hours, production-grade systems on measured timelines. We embed with your teams in two-week sprints with continuous feedback loops.</p>
+    </div>
+    <div class="step reveal reveal-delay-3">
+      <div class="step-num-wrap">
+        <div class="step-num">04</div>
+      </div>
+      <div class="step-title">Scale & Transfer</div>
+      <p class="step-desc">Harden for production, monitor in the wild, and transfer knowledge to your team. We don't create dependency — we build your internal AI capability.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDIES -->
+<section class="cases" id="work">
+  <div class="reveal">
+    <div class="section-kicker">Selected work</div>
+    <h2 class="section-title">
+      Results that<br>
+      <em>compound</em>
+    </h2>
+  </div>
+
+  <div class="cases-grid">
+    <div class="case-card reveal">
+      <div class="case-image">
+        <svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;position:absolute;inset:0;">
+          <rect width="800" height="450" fill="#0e0c08"/>
+          <!-- Grid lines -->
+          <g stroke="rgba(212,170,80,0.07)" stroke-width="1">
+            <line x1="0" y1="75" x2="800" y2="75"/><line x1="0" y1="150" x2="800" y2="150"/>
+            <line x1="0" y1="225" x2="800" y2="225"/><line x1="0" y1="300" x2="800" y2="300"/>
+            <line x1="0" y1="375" x2="800" y2="375"/>
+            <line x1="100" y1="0" x2="100" y2="450"/><line x1="200" y1="0" x2="200" y2="450"/>
+            <line x1="300" y1="0" x2="300" y2="450"/><line x1="400" y1="0" x2="400" y2="450"/>
+            <line x1="500" y1="0" x2="500" y2="450"/><line x1="600" y1="0" x2="600" y2="450"/>
+            <line x1="700" y1="0" x2="700" y2="450"/>
+          </g>
+          <!-- Rising chart area -->
+          <path d="M0 380 L80 340 L160 300 L240 280 L320 240 L400 200 L480 160 L560 120 L640 90 L720 60 L800 40 L800 450 L0 450 Z" fill="rgba(212,170,80,0.06)"/>
+          <!-- Chart line -->
+          <path d="M0 380 L80 340 L160 300 L240 280 L320 240 L400 200 L480 160 L560 120 L640 90 L720 60 L800 40" fill="none" stroke="rgba(212,170,80,0.5)" stroke-width="2"/>
+          <!-- Data points -->
+          <g fill="#d4aa50">
+            <circle cx="0" cy="380" r="4" opacity="0.7"/>
+            <circle cx="160" cy="300" r="4" opacity="0.7"/>
+            <circle cx="320" cy="240" r="4" opacity="0.7"/>
+            <circle cx="480" cy="160" r="4" opacity="0.7"/>
+            <circle cx="640" cy="90" r="5" opacity="0.9"/>
+            <circle cx="800" cy="40" r="5" opacity="0.9"/>
+          </g>
+          <!-- Vertical highlight at peak -->
+          <line x1="640" y1="90" x2="640" y2="450" stroke="rgba(212,170,80,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
+          <!-- Floating label -->
+          <rect x="480" y="30" width="160" height="42" rx="2" fill="rgba(212,170,80,0.1)" stroke="rgba(212,170,80,0.25)" stroke-width="1"/>
+          <text x="560" y="48" font-family="monospace" font-size="10" fill="#d4aa50" text-anchor="middle" letter-spacing="1">RISK SCORE</text>
+          <text x="560" y="63" font-family="monospace" font-size="13" fill="#e8c97a" text-anchor="middle" font-weight="bold">−31% DEFAULT</text>
+          <!-- Circuit nodes top-right -->
+          <circle cx="720" cy="360" r="3" fill="rgba(212,170,80,0.4)"/>
+          <circle cx="740" cy="340" r="2" fill="rgba(212,170,80,0.3)"/>
+          <circle cx="760" cy="360" r="3" fill="rgba(212,170,80,0.4)"/>
+          <line x1="720" y1="360" x2="740" y2="340" stroke="rgba(212,170,80,0.2)" stroke-width="1"/>
+          <line x1="740" y1="340" x2="760" y2="360" stroke="rgba(212,170,80,0.2)" stroke-width="1"/>
+          <!-- Gradient overlay at bottom -->
+          <defs>
+            <linearGradient id="fadeDown" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0e0c08" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#0e0c08" stop-opacity="0.85"/>
+            </linearGradient>
+          </defs>
+          <rect width="800" height="450" fill="url(#fadeDown)"/>
+        </svg>
+      </div>
+      <div class="case-tag">Financial Services</div>
+      <h3 class="case-title">Autonomous credit risk modeling for a tier-1 bank</h3>
+      <p class="case-desc">Replaced a 40-analyst manual underwriting process with an LLM-powered risk agent that synthesizes unstructured financial disclosures, news sentiment, and structured data in real time.</p>
+      <div class="case-result">Reduced decision time from 3 days to 4 minutes · 31% default rate improvement</div>
+    </div>
+    <div style="display: grid; grid-template-rows: 1fr 1fr; gap: 1px; background: var(--border);">
+      <div class="case-card reveal reveal-delay-1">
+        <div class="case-tag">Healthcare</div>
+        <h3 class="case-title" style="font-size: 1.2rem;">Clinical trial matching at scale</h3>
+        <p class="case-desc">RAG system matching 400K+ patient records against active trials in seconds.</p>
+        <div class="case-result">12× increase in eligible patient identification</div>
+      </div>
+      <div class="case-card reveal reveal-delay-2">
+        <div class="case-tag">Retail</div>
+        <h3 class="case-title" style="font-size: 1.2rem;">Demand forecasting &amp; markdown optimization</h3>
+        <p class="case-desc">ML-driven inventory system across 2,400 SKUs and 18 distribution centers.</p>
+        <div class="case-result">$47M in recovered margin over 12 months</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial-section">
+  <div class="testimonial reveal">
+    <blockquote class="testimonial-quote">
+      "AXON didn't just build us a model — they rewired how we think about intelligence in our organization. Eighteen months later, it's become our most durable competitive edge."
+    </blockquote>
+    <div class="testimonial-author">
+      <strong>Sarah Chen</strong>
+      Chief Technology Officer, Vantage Capital
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" id="team">
+  <div class="section-header">
+    <div class="reveal">
+      <div class="section-kicker">The team</div>
+      <h2 class="section-title">
+        Practitioners,<br>
+        <em>not theorists</em>
+      </h2>
+    </div>
+    <p class="section-desc reveal reveal-delay-1">
+      Former ML researchers from DeepMind, Google Brain, and OpenAI. Ex-engineering leads from Fortune 100 companies. We've built AI systems that run at billion-user scale.
+    </p>
+  </div>
+
+  <div class="team-grid">
+    <div class="team-card reveal">
+      <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" class="team-photo" style="background:#111009;">
+        <defs>
+          <radialGradient id="glow1" cx="50%" cy="40%" r="55%">
+            <stop offset="0%" stop-color="rgba(212,170,80,0.18)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+          <linearGradient id="fade1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="40%" stop-color="rgba(17,16,9,0)" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#111009" stop-opacity="1"/>
+          </linearGradient>
+        </defs>
+        <!-- Background noise grid -->
+        <g stroke="rgba(212,170,80,0.05)" stroke-width="1">
+          <line x1="0" y1="66" x2="400" y2="66"/><line x1="0" y1="133" x2="400" y2="133"/>
+          <line x1="0" y1="200" x2="400" y2="200"/><line x1="0" y1="266" x2="400" y2="266"/>
+          <line x1="0" y1="333" x2="400" y2="333"/><line x1="0" y1="400" x2="400" y2="400"/>
+          <line x1="0" y1="466" x2="400" y2="466"/>
+          <line x1="80" y1="0" x2="80" y2="533"/><line x1="160" y1="0" x2="160" y2="533"/>
+          <line x1="240" y1="0" x2="240" y2="533"/><line x1="320" y1="0" x2="320" y2="533"/>
+        </g>
+        <!-- Abstract figure silhouette -->
+        <!-- Head -->
+        <ellipse cx="200" cy="155" rx="62" ry="72" fill="rgba(212,170,80,0.08)" stroke="rgba(212,170,80,0.2)" stroke-width="1"/>
+        <!-- Neck -->
+        <rect x="182" y="222" width="36" height="40" fill="rgba(212,170,80,0.07)"/>
+        <!-- Shoulders / torso -->
+        <path d="M80 360 C80 290 140 262 200 260 C260 262 320 290 320 360 L320 533 L80 533 Z" fill="rgba(212,170,80,0.07)" stroke="rgba(212,170,80,0.15)" stroke-width="1"/>
+        <!-- Inner suit lines -->
+        <path d="M200 260 L168 310 L156 400" fill="none" stroke="rgba(212,170,80,0.12)" stroke-width="1"/>
+        <path d="M200 260 L232 310 L244 400" fill="none" stroke="rgba(212,170,80,0.12)" stroke-width="1"/>
+        <!-- Glow -->
+        <ellipse cx="200" cy="200" rx="140" ry="160" fill="url(#glow1)"/>
+        <!-- Neural node overlay -->
+        <g opacity="0.35">
+          <circle cx="200" cy="155" r="5" fill="#d4aa50"/>
+          <circle cx="155" cy="185" r="3" fill="#d4aa50" opacity="0.6"/>
+          <circle cx="245" cy="185" r="3" fill="#d4aa50" opacity="0.6"/>
+          <circle cx="180" cy="130" r="2" fill="#d4aa50" opacity="0.5"/>
+          <circle cx="220" cy="130" r="2" fill="#d4aa50" opacity="0.5"/>
+          <line x1="200" y1="155" x2="155" y2="185" stroke="#d4aa50" stroke-width="0.8"/>
+          <line x1="200" y1="155" x2="245" y2="185" stroke="#d4aa50" stroke-width="0.8"/>
+          <line x1="200" y1="155" x2="180" y2="130" stroke="#d4aa50" stroke-width="0.8"/>
+          <line x1="200" y1="155" x2="220" y2="130" stroke="#d4aa50" stroke-width="0.8"/>
+        </g>
+        <!-- Corner marks -->
+        <g stroke="rgba(212,170,80,0.3)" stroke-width="1.5" fill="none">
+          <path d="M20 20 L20 40 M20 20 L40 20"/>
+          <path d="M380 20 L380 40 M380 20 L360 20"/>
+          <path d="M20 513 L20 493 M20 513 L40 513"/>
+          <path d="M380 513 L380 493 M380 513 L360 513"/>
+        </g>
+        <!-- Bottom fade -->
+        <rect width="400" height="533" fill="url(#fade1)"/>
+      </svg>
+      <div class="team-info">
+        <div class="team-name">Marcus Reid</div>
+        <div class="team-role">Founder & CEO — ex-DeepMind</div>
+      </div>
+    </div>
+    <div class="team-card reveal reveal-delay-1">
+      <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" class="team-photo" style="background:#0f0e0c;">
+        <defs>
+          <radialGradient id="glow2" cx="50%" cy="38%" r="52%">
+            <stop offset="0%" stop-color="rgba(200,146,42,0.16)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+          <linearGradient id="fade2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="40%" stop-color="rgba(15,14,12,0)" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#0f0e0c" stop-opacity="1"/>
+          </linearGradient>
+        </defs>
+        <!-- Diagonal stripe texture -->
+        <g stroke="rgba(200,146,42,0.04)" stroke-width="1">
+          <line x1="-40" y1="0" x2="160" y2="533"/>
+          <line x1="0" y1="0" x2="200" y2="533"/>
+          <line x1="60" y1="0" x2="260" y2="533"/>
+          <line x1="120" y1="0" x2="320" y2="533"/>
+          <line x1="180" y1="0" x2="380" y2="533"/>
+          <line x1="240" y1="0" x2="440" y2="533"/>
+          <line x1="300" y1="0" x2="500" y2="533"/>
+          <line x1="360" y1="0" x2="560" y2="533"/>
+        </g>
+        <!-- Head — slightly different proportion -->
+        <ellipse cx="200" cy="148" rx="58" ry="68" fill="rgba(200,146,42,0.09)" stroke="rgba(200,146,42,0.22)" stroke-width="1"/>
+        <!-- Neck -->
+        <rect x="184" y="212" width="32" height="42" fill="rgba(200,146,42,0.07)"/>
+        <!-- Torso -->
+        <path d="M85 370 C85 295 145 268 200 265 C255 268 315 295 315 370 L315 533 L85 533 Z" fill="rgba(200,146,42,0.07)" stroke="rgba(200,146,42,0.14)" stroke-width="1"/>
+        <!-- Lapels -->
+        <path d="M200 265 L172 305 L200 335 L228 305 Z" fill="rgba(200,146,42,0.05)" stroke="rgba(200,146,42,0.15)" stroke-width="1"/>
+        <!-- Glow -->
+        <ellipse cx="200" cy="195" rx="135" ry="155" fill="url(#glow2)"/>
+        <!-- Hex pattern overlay on head -->
+        <g opacity="0.28" stroke="#c8922a" stroke-width="0.8" fill="none">
+          <polygon points="200,120 215,129 215,147 200,156 185,147 185,129"/>
+          <polygon points="200,156 215,165 215,183 200,192 185,183 185,165"/>
+          <polygon points="170,138 185,147 185,165 170,174 155,165 155,147"/>
+          <polygon points="230,138 245,147 245,165 230,174 215,165 215,147"/>
+        </g>
+        <!-- Corner marks -->
+        <g stroke="rgba(200,146,42,0.3)" stroke-width="1.5" fill="none">
+          <path d="M20 20 L20 40 M20 20 L40 20"/>
+          <path d="M380 20 L380 40 M380 20 L360 20"/>
+          <path d="M20 513 L20 493 M20 513 L40 513"/>
+          <path d="M380 513 L380 493 M380 513 L360 513"/>
+        </g>
+        <rect width="400" height="533" fill="url(#fade2)"/>
+      </svg>
+      <div class="team-info">
+        <div class="team-name">Yuki Tanaka</div>
+        <div class="team-role">Head of Research — ex-Google Brain</div>
+      </div>
+    </div>
+    <div class="team-card reveal reveal-delay-2">
+      <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" class="team-photo" style="background:#100f0d;">
+        <defs>
+          <radialGradient id="glow3" cx="50%" cy="38%" r="55%">
+            <stop offset="0%" stop-color="rgba(212,170,80,0.14)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+          <linearGradient id="fade3" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="40%" stop-color="rgba(16,15,13,0)" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#100f0d" stop-opacity="1"/>
+          </linearGradient>
+        </defs>
+        <!-- Concentric rings texture -->
+        <g stroke="rgba(212,170,80,0.05)" stroke-width="1" fill="none">
+          <circle cx="200" cy="200" r="50"/>
+          <circle cx="200" cy="200" r="90"/>
+          <circle cx="200" cy="200" r="130"/>
+          <circle cx="200" cy="200" r="175"/>
+          <circle cx="200" cy="200" r="225"/>
+          <circle cx="200" cy="200" r="280"/>
+        </g>
+        <!-- Head -->
+        <ellipse cx="200" cy="150" rx="60" ry="70" fill="rgba(212,170,80,0.08)" stroke="rgba(212,170,80,0.2)" stroke-width="1"/>
+        <!-- Hair suggestion - top arc -->
+        <path d="M145 150 C145 100 168 90 200 88 C232 90 255 100 255 150" fill="rgba(212,170,80,0.06)" stroke="rgba(212,170,80,0.18)" stroke-width="1"/>
+        <!-- Neck -->
+        <rect x="183" y="216" width="34" height="40" fill="rgba(212,170,80,0.07)"/>
+        <!-- Torso -->
+        <path d="M82 375 C82 298 144 268 200 265 C256 268 318 298 318 375 L318 533 L82 533 Z" fill="rgba(212,170,80,0.07)" stroke="rgba(212,170,80,0.13)" stroke-width="1"/>
+        <!-- Subtle collar -->
+        <path d="M200 265 L176 295 M200 265 L224 295" stroke="rgba(212,170,80,0.18)" stroke-width="1" fill="none"/>
+        <!-- Glow -->
+        <ellipse cx="200" cy="195" rx="138" ry="158" fill="url(#glow3)"/>
+        <!-- Scatter nodes -->
+        <g opacity="0.3" fill="#d4aa50">
+          <circle cx="130" cy="100" r="2"/><circle cx="160" cy="75" r="1.5"/>
+          <circle cx="200" cy="65" r="2.5"/><circle cx="240" cy="75" r="1.5"/>
+          <circle cx="270" cy="100" r="2"/>
+          <circle cx="285" cy="135" r="1.5"/><circle cx="115" cy="135" r="1.5"/>
+        </g>
+        <g opacity="0.15" stroke="#d4aa50" stroke-width="0.8" fill="none">
+          <line x1="130" y1="100" x2="160" y2="75"/>
+          <line x1="160" y1="75" x2="200" y2="65"/>
+          <line x1="200" y1="65" x2="240" y2="75"/>
+          <line x1="240" y1="75" x2="270" y2="100"/>
+          <line x1="270" y1="100" x2="285" y2="135"/>
+          <line x1="130" y1="100" x2="115" y2="135"/>
+        </g>
+        <!-- Corner marks -->
+        <g stroke="rgba(212,170,80,0.3)" stroke-width="1.5" fill="none">
+          <path d="M20 20 L20 40 M20 20 L40 20"/>
+          <path d="M380 20 L380 40 M380 20 L360 20"/>
+          <path d="M20 513 L20 493 M20 513 L40 513"/>
+          <path d="M380 513 L380 493 M380 513 L360 513"/>
+        </g>
+        <rect width="400" height="533" fill="url(#fade3)"/>
+      </svg>
+      <div class="team-info">
+        <div class="team-name">Priya Narayan</div>
+        <div class="team-role">Head of Engineering — ex-OpenAI</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="reveal">
+    <div class="cta-kicker">Ready to begin</div>
+    <h2 class="cta-title">
+      Let's build something<br>
+      <em>extraordinary</em>
+    </h2>
+    <p class="cta-sub">
+      Every engagement starts with a 60-minute discovery call — no pitch, no pressure. Just a rigorous conversation about where AI can move the needle for your business.
+    </p>
+    <div class="cta-actions">
+      <a href="#" class="btn-primary"><span>Book a discovery call</span></a>
+      <a href="mailto:hello@axon.ai" class="btn-ghost">hello@axon.ai</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <a href="#" class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="4" fill="#d4aa50"/>
+          <circle cx="18" cy="18" r="7" stroke="#d4aa50" stroke-width="0.8" opacity="0.4"/>
+          <line x1="18" y1="11" x2="18" y2="4" stroke="#d4aa50" stroke-width="0.8"/>
+          <line x1="18" y1="25" x2="18" y2="32" stroke="#d4aa50" stroke-width="0.8"/>
+          <line x1="11" y1="18" x2="4" y2="18" stroke="#d4aa50" stroke-width="0.8"/>
+          <line x1="25" y1="18" x2="32" y2="18" stroke="#d4aa50" stroke-width="0.8"/>
+          <line x1="13" y1="13" x2="7" y2="7" stroke="#d4aa50" stroke-width="0.8" opacity="0.6"/>
+          <line x1="23" y1="13" x2="29" y2="7" stroke="#d4aa50" stroke-width="0.8" opacity="0.6"/>
+          <line x1="13" y1="23" x2="7" y2="29" stroke="#d4aa50" stroke-width="0.8" opacity="0.6"/>
+          <line x1="23" y1="23" x2="29" y2="29" stroke="#d4aa50" stroke-width="0.8" opacity="0.6"/>
+          <circle cx="18" cy="4" r="1.5" fill="#d4aa50" opacity="0.7"/>
+          <circle cx="18" cy="32" r="1.5" fill="#d4aa50" opacity="0.7"/>
+          <circle cx="4" cy="18" r="1.5" fill="#d4aa50" opacity="0.7"/>
+          <circle cx="32" cy="18" r="1.5" fill="#d4aa50" opacity="0.7"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">AXON</div>
+        <div class="logo-sub">AI Consulting</div>
+      </div>
+    </a>
+    <p class="footer-tagline">Frontier AI consulting for organizations that refuse to be disrupted.</p>
+    <div class="footer-social">
+      <a href="#" class="social-link" aria-label="LinkedIn">in</a>
+      <a href="#" class="social-link" aria-label="Twitter">𝕏</a>
+      <a href="#" class="social-link" aria-label="GitHub">gh</a>
+    </div>
+  </div>
+  <div class="footer-col">
+    <h4>Services</h4>
+    <ul>
+      <li><a href="#">AI Strategy</a></li>
+      <li><a href="#">LLM Engineering</a></li>
+      <li><a href="#">Agentic Systems</a></li>
+      <li><a href="#">Predictive ML</a></li>
+      <li><a href="#">MLOps</a></li>
+      <li><a href="#">AI Governance</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Company</h4>
+    <ul>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Team</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Writing</a></li>
+      <li><a href="#">Press</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Contact</h4>
+    <ul>
+      <li><a href="#">hello@axon.ai</a></li>
+      <li><a href="#">New York</a></li>
+      <li><a href="#">London</a></li>
+      <li><a href="#">Singapore</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span class="footer-bottom-text">© 2026 AXON AI Consulting. All rights reserved.</span>
+  <span class="footer-bottom-text">Privacy · Terms · Cookie Policy</span>
+</div>
+
+<script>
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '14px';
+      cursor.style.height = '14px';
+      ring.style.width = '50px';
+      ring.style.height = '50px';
+      ring.style.borderColor = 'var(--gold)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '8px';
+      cursor.style.height = '8px';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+      ring.style.borderColor = 'var(--gold-dim)';
+    });
+  });
+
+  // NAV SCROLL
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // NEURAL CANVAS
+  const canvas = document.getElementById('neuralCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes = [];
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function initNodes() {
+    nodes = [];
+    const count = Math.floor((W * H) / 14000);
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 2 + 1
+      });
+    }
+  }
+
+  function drawNeural() {
+    ctx.clearRect(0, 0, W, H);
+    const gold = [212, 170, 80];
+
+    // Draw connections
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 160) {
+          const alpha = (1 - dist / 160) * 0.35;
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(${gold[0]},${gold[1]},${gold[2]},${alpha})`;
+          ctx.lineWidth = 0.6;
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw nodes
+    nodes.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(212,170,80,0.6)`;
+      ctx.fill();
+
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < 0 || n.x > W) n.vx *= -1;
+      if (n.y < 0 || n.y > H) n.vy *= -1;
+    });
+
+    requestAnimationFrame(drawNeural);
+  }
+
+  window.addEventListener('resize', () => { resize(); initNodes(); });
+  resize();
+  initNodes();
+  drawNeural();
+
+  // SCROLL REVEAL
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
