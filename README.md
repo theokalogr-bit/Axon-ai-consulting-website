@@ -2,10 +2,7 @@
 
 A modern, production-grade landing page for a fictional AI consulting company called **AXON**. Built as a portfolio project to demonstrate frontend design and development skills.
 
-## Live Demo
-
-> Deploy via GitHub Pages: Settings → Pages → Branch: main → Save  
-> Live at: `https://theokalogr-bit.github.io/Axon-ai-consulting-website`
+**[Live Demo →](https://theokalogr-bit.github.io/Axon-ai-consulting-website)**
 
 ## Preview
 
