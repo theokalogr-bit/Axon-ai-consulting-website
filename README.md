@@ -2,6 +2,10 @@
 
 > A production-grade landing page for an AI automation consulting business — dark editorial aesthetic, animated neural network hero, and conversion-focused layout. No frameworks. Single file.
 
+## Demo
+
+> Demo GIF coming soon — see [Run It](#run-it) to open locally, or view the [live preview](https://theokalogr-bit.github.io/Axon-ai-consulting-website/).
+
 ## What This Is
 
 A complete, deployable landing page built for AI and tech consulting companies. Dark luxury aesthetic, animated canvas background, scroll-triggered reveals, and clear service positioning — everything a professional AI services website needs.
